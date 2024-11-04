@@ -1,6 +1,46 @@
 from pytubefix import YouTube, Playlist
 
-def download_audio(youtube_link, output_dir):
+
+def download_audio(youtube_link, output_dir, progress_callback=None):
+    try:
+        print(f"Attempting to download audio from: {youtube_link}")
+
+        # Create YouTube object with on_progress_callback if provided
+        yt = YouTube(youtube_link)
+
+        if progress_callback:
+            # Define a progress callback function
+            def on_progress(stream, chunk, bytes_remaining):
+                total_size = stream.filesize
+                bytes_downloaded = total_size - bytes_remaining
+                percentage = (bytes_downloaded / total_size) * 100
+                progress_callback(percentage)
+                print(f"Download progress: {percentage:.2f}%")
+
+            yt.register_on_progress_callback(on_progress)
+
+        # Get the highest bitrate audio stream
+        audio_stream = yt.streams.filter(only_audio=True).order_by('abr').desc().first()
+
+        if audio_stream is None:
+            print("Failed to find audio stream.")
+            return ""
+
+        sanitized_title = sanitize_filename(yt.title)
+        file_extension = audio_stream.mime_type.split('/')[1]
+
+        # Download the audio stream
+        audio_file = audio_stream.download(output_path=output_dir, filename=f"{sanitized_title}_audio.{file_extension}")
+
+        print(f"Download successful: {audio_file}")
+        return audio_file  # Return the path to the downloaded audio file
+
+    except Exception as e:
+        print(f"Attempt failed: {e}")
+        return ""  # Return an empty string on failure
+
+
+def download_audio2(youtube_link, output_dir):
     try:
         yt = YouTube(youtube_link)
         # Get the highest bitrate audio stream

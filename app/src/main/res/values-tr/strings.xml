@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">ComposeDeneme</string>
+    <string name="search_hint">Ara...</string>
+    <string name="locale">TR</string>
+
+    <string name="channel_name">Dönüşüm Bildirimleri</string>
+    <string name="channel_description">Dönüşüm ilerlemesi ve tamamlanması için bildirimler</string>
+
+    <string name="download_video">Videoyu İndir</string>
+    <string name="download_audio">Sesi İndir</string>
+    <string name="video">Video</string>
+    <string name="audio">Ses</string>
+    <string name="channel">Kanal: %1$s</string>
+    <string name="duration">Süre: %1$s</string>
+</resources>

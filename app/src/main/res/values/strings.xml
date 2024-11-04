@@ -1,9 +1,16 @@
 <resources>
-    <string name="app_name">YouTube Video Search</string>
-    <string name="search_hint">Search videos...</string>
+    <string name="app_name">ComposeDeneme</string>
+    <string name="search_hint">Search...</string>
     <string name="locale">TR</string>
 
     <string name="channel_name">Conversion Notifications</string>
     <string name="channel_description">Notifications for conversion progress and completion</string>
+
+    <string name="download_video">Download Video</string>
+    <string name="download_audio">Download Audio</string>
+    <string name="video">Video</string>
+    <string name="audio">Audio</string>
+    <string name="channel">Channel: %1$s</string>
+    <string name="duration">Duration: %1$s</string>
 
 </resources>

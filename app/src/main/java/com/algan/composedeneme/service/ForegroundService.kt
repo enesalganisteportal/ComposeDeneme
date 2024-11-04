@@ -173,7 +173,9 @@ class ForegroundService : Service() {
                 withContext(Dispatchers.Main) {
                     showToast(applicationContext, "Conversion has started!")
                 }
-                val downloadPath = DownloadUtils.downloadYouTubeAudio(applicationContext, youtubeUrl)
+                val downloadPath = DownloadUtils.downloadYouTubeAudio(applicationContext, youtubeUrl){
+                    updateNotificationProgress(it.toInt(),false)
+                }
 
                 if (downloadPath.isNotEmpty() && FileUtils.fileExists(downloadPath)) {
                     val outputPath = FileUtils.getMp3OutputPath(downloadPath, applicationContext)
@@ -624,9 +626,9 @@ class ForegroundService : Service() {
                 }
             }
             val notification = createNotification(
-                contentText = "Conversion in progress...",
+                contentText = "İndiriyor... $progress%",
                 showProgress = true,
-                progress = progress,
+                progress = if (indeterminate) 0 else progress,
                 indeterminate = indeterminate
             )
             startForeground(notificationId, notification)
@@ -682,7 +684,7 @@ class ForegroundService : Service() {
         indeterminate: Boolean
     ): Notification {
         val builder = NotificationCompat.Builder(this, channelId)
-            .setContentTitle("Youtube Converter")
+            .setContentTitle("Music 76")
             .setContentText(contentText)
             .setSmallIcon(android.R.drawable.stat_sys_download) // System icon for download in progress
             .setOngoing(showProgress)

@@ -3,6 +3,8 @@ package com.algan.composedeneme.presentation.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -16,6 +18,7 @@ import androidx.compose.foundation.lazy.items // Eksik olan import
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.getValue
@@ -24,7 +27,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -40,34 +45,39 @@ import com.algan.composedeneme.service.ForegroundService
 fun VideoListScreen(viewModel: VideoViewModel = hiltViewModel()) {
     val context = LocalContext.current
     var searchQuery by remember { mutableStateOf("") }
+    var isSearchFocused by remember { mutableStateOf(false) }
 
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(title = { Text(stringResource(R.string.app_name)) })
-        }
-    ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
-            Spacer(modifier = Modifier.height(16.dp))
-
-            TextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                placeholder = { Text(stringResource(R.string.search_hint)) },
+    Box {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Search
-                ),
-                keyboardActions = KeyboardActions(
-                    onSearch = {
-                        viewModel.searchVideos(searchQuery)
-                    }
-                )
-            )
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Animated visibility for logo to show/hide based on search focus
+                AnimatedVisibility(visible = !isSearchFocused) {
+                    Image(
+                        painter = painterResource(id = R.drawable.app_logo),
+                        contentDescription = null,
+                        modifier = Modifier.size(96.dp) // Adjust size as needed
+                    )
+                }
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.width(8.dp)) // Space between logo and SearchBar
+
+                // Search bar with focus tracking
+                SearchBar(
+                    searchQuery = searchQuery,
+                    onSearchQueryChange = { searchQuery = it },
+                    onSearch = { viewModel.searchVideos(searchQuery) },
+                    modifier = Modifier
+                        .weight(1f)
+                        .onFocusChanged { focusState ->
+                            isSearchFocused = focusState.isFocused
+                        }
+                )
+            }
+
 
             when (val state = viewModel.videoState.value) {
                 is VideoState.Loading -> {
@@ -84,8 +94,14 @@ fun VideoListScreen(viewModel: VideoViewModel = hiltViewModel()) {
                         items(state.data) { video ->
                             VideoCard(
                                 video,
-                                onClick = {
-                                    viewModel.startYouTubeToMP3ConversionService(context,video.urlSuffix)
+                                onAudioDownloadClick = {
+                                    viewModel.startYouTubeToMP3ConversionService(
+                                        context,
+                                        video.urlSuffix
+                                    )
+                                },
+                                onVideoDownloadClick = {
+
                                 }
                             )
                         }

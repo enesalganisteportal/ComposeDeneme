@@ -70,10 +70,8 @@ class VideoViewModel @Inject constructor(
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // For Android O and above, use startForegroundService
             context.startForegroundService(intent)
         } else {
-            // For Android versions below O, use startService
             context.startService(intent)
         }
     }
